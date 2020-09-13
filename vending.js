@@ -78,9 +78,7 @@ class Vending {
             this.coinLookup[coinName].count += 1;
         }
     }
-    getChange = () => {
-        return this.rejectedCoins;
-    }
+    getChange = () => this.rejectedCoins;
 
     makeChange = (remainingBalance) => {
         const initialRejectedCoins = [...this.rejectedCoins];
@@ -103,10 +101,8 @@ class Vending {
         return true;
     }
 
-    resetState = (initialRejectedCoins) => {
-        this.rejectedCoins = initialRejectedCoins;
-    }
-
+    resetState = (initialRejectedCoins) => this.rejectedCoins = initialRejectedCoins;
+    
     selectProduct = (productNumber) => {
         let responseMessage = ""
         let selectedProduct = this.productLookUp[parseInt(productNumber)];
@@ -133,7 +129,6 @@ class Vending {
             selectedProduct.inventory -= 1;
             this.balance = 0;
             responseMessage = "THANK YOU";
-
         }
         return responseMessage;
     }
