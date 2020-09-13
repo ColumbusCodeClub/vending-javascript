@@ -111,7 +111,7 @@ class Vending {
         let responseMessage = ""
         let selectedProduct = this.productLookUp[parseInt(productNumber)];
         responseMessage = this.checkForEnoughMoney(selectedProduct, responseMessage);
-        responseMessage = this.checkForSoldOut(selectedProduct, responseMessage);        
+        responseMessage = checkForSoldOut(this.balance, selectedProduct, responseMessage);        
         responseMessage = checkForExactChange(this.calculatePurchase(selectedProduct), responseMessage);
         responseMessage = this.successfulPurchase(responseMessage, selectedProduct);
         this.displayText = responseMessage
@@ -136,12 +136,7 @@ class Vending {
         return responseMessage;
     }
 
-    checkForSoldOut(selectedProduct, responseMessage) {
-        if (this.enoughMoney(selectedProduct) && isSoldOut(selectedProduct)) {
-            responseMessage = "SOLD OUT";
-        }
-        return responseMessage;
-    }
+
 
 
 
@@ -165,13 +160,13 @@ class Vending {
         return this.balance < selectedProduct.price;
     }
 
-    enoughMoney(selectedProduct) {
-        return this.balance > selectedProduct.price;
-    }
+
 }
 
 const exactChangeRequired = (makeChangeRes) => !makeChangeRes
 const isSoldOut = (selectedProduct) => selectedProduct.inventory === 0;
 const checkForExactChange = (makeChangeRes, responseMessage) => exactChangeRequired(makeChangeRes) ? responseMessage = "EXACT CHANGE ONLY" : responseMessage
+const enoughMoney = (selectedProduct, balance) => balance > selectedProduct.price
+const checkForSoldOut = (balance, selectedProduct, responseMessage) => (enoughMoney(selectedProduct, balance) && isSoldOut(selectedProduct)) ? responseMessage = "SOLD OUT" : responseMessage
 
 module.exports = Vending;
