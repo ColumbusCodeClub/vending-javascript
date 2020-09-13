@@ -110,7 +110,7 @@ class Vending {
     selectProduct = (productNumber) => {
         let responseMessage = ""
         let selectedProduct = this.productLookUp[parseInt(productNumber)];
-        responseMessage = this.checkForEnoughMoney(selectedProduct, responseMessage);
+        responseMessage = checkForEnoughMoney(this.balance, selectedProduct, responseMessage);
         responseMessage = checkForSoldOut(this.balance, selectedProduct, responseMessage);        
         responseMessage = checkForExactChange(this.calculatePurchase(selectedProduct), responseMessage);
         responseMessage = this.successfulPurchase(responseMessage, selectedProduct);
@@ -118,8 +118,7 @@ class Vending {
     }
 
     returnCoins = () => {
-        let remainingBalance = this.balance;
-        this.makeChange(remainingBalance);
+        this.makeChange(this.balance);
         this.balance = 0;
     }
 
@@ -127,13 +126,6 @@ class Vending {
         let remainingBalance = calcRemainingBalance(this.balance, selectedProduct);
         let makeChangeRes = this.makeChange(remainingBalance);
         return makeChangeRes;
-    }
-
-    checkForEnoughMoney(selectedProduct, responseMessage) {
-        if (notEnoughMoney(this.balance, selectedProduct)) {
-            responseMessage = "PRICE $" + selectedProduct.price.toFixed(2);
-        }
-        return responseMessage;
     }
 
     successfulPurchase(responseMessage, selectedProduct) {
@@ -146,10 +138,6 @@ class Vending {
         return responseMessage;
     }
 
-
-
-
-
 }
 
 const exactChangeRequired = (makeChangeRes) => !makeChangeRes
@@ -159,5 +147,6 @@ const enoughMoney = (selectedProduct, balance) => balance > selectedProduct.pric
 const notEnoughMoney = (balance, selectedProduct) => balance < selectedProduct.price
 const checkForSoldOut = (balance, selectedProduct, responseMessage) => (enoughMoney(selectedProduct, balance) && isSoldOut(selectedProduct)) ? responseMessage = "SOLD OUT" : responseMessage
 const calcRemainingBalance = (balance,  selectedProduct) => (((balance * 100) - (selectedProduct.price * 100)) / 100)
+const checkForEnoughMoney = (balance, selectedProduct, responseMessage) => notEnoughMoney(balance, selectedProduct) ? responseMessage = "PRICE $" + selectedProduct.price.toFixed(2) : responseMessage
 
 module.exports = Vending;
