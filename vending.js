@@ -112,8 +112,7 @@ class Vending {
         let selectedProduct = this.productLookUp[parseInt(productNumber)];
         responseMessage = this.checkForEnoughMoney(selectedProduct, responseMessage);
         responseMessage = this.checkForSoldOut(selectedProduct, responseMessage);        
-        let makeChangeRes = this.calculatePurchase(selectedProduct);
-        responseMessage = this.checkForExactChange(makeChangeRes, responseMessage);
+        responseMessage = this.checkForExactChange(this.calculatePurchase(selectedProduct), responseMessage);
         responseMessage = this.successfulPurchase(responseMessage, selectedProduct);
         this.displayText = responseMessage
     }
@@ -138,14 +137,14 @@ class Vending {
     }
 
     checkForSoldOut(selectedProduct, responseMessage) {
-        if (this.enoughMoney(selectedProduct) && this.isSoldOut(selectedProduct)) {
+        if (this.enoughMoney(selectedProduct) && isSoldOut(selectedProduct)) {
             responseMessage = "SOLD OUT";
         }
         return responseMessage;
     }
 
     checkForExactChange(makeChangeRes, responseMessage) {
-        if (this.exactChangeRequired(makeChangeRes)) {
+        if (exactChangeRequired(makeChangeRes)) {
             responseMessage = "EXACT CHANGE ONLY";
         }
         return responseMessage;
@@ -161,13 +160,7 @@ class Vending {
         return responseMessage;
     }
 
-    exactChangeRequired(makeChangeRes) {
-        return !makeChangeRes;
-    }
 
-    isSoldOut(selectedProduct) {
-        return selectedProduct.inventory === 0;
-    }
 
     calcRemainingBalance(selectedProduct) {
         return (((this.balance * 100) - (selectedProduct.price * 100)) / 100);
@@ -181,5 +174,8 @@ class Vending {
         return this.balance > selectedProduct.price;
     }
 }
+
+const exactChangeRequired = (makeChangeRes) => !makeChangeRes
+const isSoldOut = (selectedProduct) => selectedProduct.inventory === 0;
 
 module.exports = Vending;
