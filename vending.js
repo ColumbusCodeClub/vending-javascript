@@ -18,12 +18,12 @@ class Vending {
         };
 
         this.coinReverseLookupArray = [
-            { 
+            {
                 coinValue: 25,
                 coinName: "quarter",
                 coin: this.coinLookup.quarter
             },
-            { 
+            {
                 coinValue: 10,
                 coinName: "dime",
                 coin: this.coinLookup.dime
@@ -111,26 +111,28 @@ class Vending {
         let responseMessage = ""
         let selectedProduct = this.productLookUp[parseInt(productNumber)];
         if (this.notEnoughMoney(selectedProduct)) {
-            this.displayText = "PRICE $" + selectedProduct.price.toFixed(2);
+            responseMessage = "PRICE $" + selectedProduct.price.toFixed(2);
         }
-        else {
-            if (this.enoughMoney(selectedProduct)) {
-                if (this.isSoldOut(selectedProduct)) {
-                    this.displayText = "SOLD OUT";
-                    return;
-                }
-                let remainingBalance = this.calcRemainingBalance(selectedProduct);
-                let makeChangeRes = this.makeChange(remainingBalance);
-                if (this.exactChangeRequired(makeChangeRes)) {
-                    this.displayText = "EXACT CHANGE ONLY";
-                    return;
-                }
-            }
+
+        if (this.enoughMoney(selectedProduct) && this.isSoldOut(selectedProduct)) {
+            responseMessage = "SOLD OUT";
+        }
+        let remainingBalance = this.calcRemainingBalance(selectedProduct);
+        let makeChangeRes = this.makeChange(remainingBalance);
+
+        if (this.exactChangeRequired(makeChangeRes)) {
+            responseMessage = "EXACT CHANGE ONLY";
+        }
+
+        if (responseMessage === "") {
             selectedProduct.inventory -= 1;
             this.balance = 0;
-            this.displayText = "THANK YOU";
+            responseMessage = "THANK YOU";
+            
         }
+        this.displayText = responseMessage
     }
+
     returnCoins = () => {
         let remainingBalance = this.balance;
         this.makeChange(remainingBalance);
