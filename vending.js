@@ -110,26 +110,11 @@ class Vending {
     selectProduct = (productNumber) => {
         let responseMessage = ""
         let selectedProduct = this.productLookUp[parseInt(productNumber)];
-        if (this.notEnoughMoney(selectedProduct)) {
-            responseMessage = "PRICE $" + selectedProduct.price.toFixed(2);
-        }
-
-        if (this.enoughMoney(selectedProduct) && this.isSoldOut(selectedProduct)) {
-            responseMessage = "SOLD OUT";
-        }
-        let remainingBalance = this.calcRemainingBalance(selectedProduct);
-        let makeChangeRes = this.makeChange(remainingBalance);
-
-        if (this.exactChangeRequired(makeChangeRes)) {
-            responseMessage = "EXACT CHANGE ONLY";
-        }
-
-        if (responseMessage === "") {
-            selectedProduct.inventory -= 1;
-            this.balance = 0;
-            responseMessage = "THANK YOU";
-            
-        }
+        responseMessage = this.checkForEnoughMoney(selectedProduct, responseMessage);
+        responseMessage = this.checkForSoldOut(selectedProduct, responseMessage);        
+        let makeChangeRes = this.calculatePurchase(selectedProduct);
+        responseMessage = this.checkForExactChange(makeChangeRes, responseMessage);
+        responseMessage = this.successfulPurchase(responseMessage, selectedProduct);
         this.displayText = responseMessage
     }
 
@@ -137,6 +122,43 @@ class Vending {
         let remainingBalance = this.balance;
         this.makeChange(remainingBalance);
         this.balance = 0;
+    }
+
+    calculatePurchase(selectedProduct) {
+        let remainingBalance = this.calcRemainingBalance(selectedProduct);
+        let makeChangeRes = this.makeChange(remainingBalance);
+        return makeChangeRes;
+    }
+
+    checkForEnoughMoney(selectedProduct, responseMessage) {
+        if (this.notEnoughMoney(selectedProduct)) {
+            responseMessage = "PRICE $" + selectedProduct.price.toFixed(2);
+        }
+        return responseMessage;
+    }
+
+    checkForSoldOut(selectedProduct, responseMessage) {
+        if (this.enoughMoney(selectedProduct) && this.isSoldOut(selectedProduct)) {
+            responseMessage = "SOLD OUT";
+        }
+        return responseMessage;
+    }
+
+    checkForExactChange(makeChangeRes, responseMessage) {
+        if (this.exactChangeRequired(makeChangeRes)) {
+            responseMessage = "EXACT CHANGE ONLY";
+        }
+        return responseMessage;
+    }
+
+    successfulPurchase(responseMessage, selectedProduct) {
+        if (responseMessage === "") {
+            selectedProduct.inventory -= 1;
+            this.balance = 0;
+            responseMessage = "THANK YOU";
+
+        }
+        return responseMessage;
     }
 
     exactChangeRequired(makeChangeRes) {
