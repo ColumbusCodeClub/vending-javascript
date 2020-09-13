@@ -90,7 +90,6 @@ class Vending {
                 const currentCoin = this.coinReverseLookupArray[i];
                 if (currentCoin.coinValue <= remainingBalance) {
                     this.rejectedCoins.push(currentCoin.coinName);
-                    //for EXACT CHANGE ONLY scenario - Last TestCase
                     if (currentCoin.coin.count - 1 < 1) {
                         this.resetState(initialRejectedCoins);
                         return false;
@@ -116,13 +115,13 @@ class Vending {
         }
         else {
             if (this.enoughMoney(selectedProduct)) {
-                if (selectedProduct.inventory === 0) {
+                if (this.isSoldOut(selectedProduct)) {
                     this.displayText = "SOLD OUT";
                     return;
                 }
                 let remainingBalance = this.calcRemainingBalance(selectedProduct);
                 let makeChangeRes = this.makeChange(remainingBalance);
-                if (!makeChangeRes) {
+                if (this.exactChangeRequired(makeChangeRes)) {
                     this.displayText = "EXACT CHANGE ONLY";
                     return;
                 }
@@ -136,6 +135,14 @@ class Vending {
         let remainingBalance = this.balance;
         this.makeChange(remainingBalance);
         this.balance = 0;
+    }
+
+    exactChangeRequired(makeChangeRes) {
+        return !makeChangeRes;
+    }
+
+    isSoldOut(selectedProduct) {
+        return selectedProduct.inventory === 0;
     }
 
     calcRemainingBalance(selectedProduct) {
