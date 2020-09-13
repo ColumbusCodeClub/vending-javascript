@@ -109,6 +109,7 @@ class Vending {
     }
 
     selectProduct = (productNumber) => {
+        let responseMessage = ""
         let selectedProduct = this.productLookUp[parseInt(productNumber)];
         if (this.notEnoughMoney(selectedProduct)) {
             this.displayText = "PRICE $" + selectedProduct.price.toFixed(2);
@@ -119,7 +120,7 @@ class Vending {
                     this.displayText = "SOLD OUT";
                     return;
                 }
-                let remainingBalance = (((this.balance * 100) - (selectedProduct.price * 100)) / 100);
+                let remainingBalance = this.calcRemainingBalance(selectedProduct);
                 let makeChangeRes = this.makeChange(remainingBalance);
                 if (!makeChangeRes) {
                     this.displayText = "EXACT CHANGE ONLY";
@@ -135,6 +136,10 @@ class Vending {
         let remainingBalance = this.balance;
         this.makeChange(remainingBalance);
         this.balance = 0;
+    }
+
+    calcRemainingBalance(selectedProduct) {
+        return (((this.balance * 100) - (selectedProduct.price * 100)) / 100);
     }
 
     notEnoughMoney(selectedProduct) {
