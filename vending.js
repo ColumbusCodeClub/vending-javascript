@@ -60,54 +60,54 @@ class Vending {
         this.rejectedCoins = [];
         this.displayText = '';
     }
+    getDefaultDisplay = () => this.balance === 0.0 ? "INSERT COINS" : ("balance: " + this.balance.toFixed(2));
     getDisplay = () => {
         let currentDisplay = this.displayText;
-        if (currentDisplay.length === 0) {
-            currentDisplay = this.balance === 0.0 ? "INSERT COINS" : ("balance: " + this.balance.toFixed(2));
-        }
         this.displayText = '';
-        return currentDisplay;
+        const currentDisplayIsEmpty = currentDisplay.length === 0;
+        return currentDisplayIsEmpty ? this.getDefaultDisplay() : currentDisplay;
     }
     insertCoin = (coinName) => {
-        const identifiedCoin = this.coinLookup[coinName];
-
-        if (!identifiedCoin) {
+        const coinIdentified = this.coinLookup[coinName];
+        if (!coinIdentified) {
             this.rejectedCoins.push(coinName);
         } else {
-            this.balance += identifiedCoin.value;
+            this.balance += coinIdentified.value;
             this.coinLookup[coinName].count += 1;
         }
     }
     getChange = () => {
         return this.rejectedCoins;
     }
-
+    processCoinRejection = (remainingBalance, initialRejectedCoins) => {
+        for (let i = 0; i < this.coinReverseLookupArray.length; i++) {
+            const currentCoin = this.coinReverseLookupArray[i];
+            if (currentCoin.coinValue <= remainingBalance) {
+                this.rejectedCoins.push(currentCoin.coinName);
+                //for EXACT CHANGE ONLY scenario - Last TestCase
+                if (currentCoin.coin.count - 1 < 1) {
+                    this.resetState(initialRejectedCoins);
+                    return false;
+                }
+                currentCoin.coin.count -= 1;
+                remainingBalance -= currentCoin.coinValue;
+                break;
+            }
+        }
+        return remainingBalance;
+    }
     makeChange = (remainingBalance) => {
         const initialRejectedCoins = [...this.rejectedCoins];
-        remainingBalance = remainingBalance * 100
+        remainingBalance = remainingBalance * 100;
+        const testObj = { initialRejectedCoins, remainingBalance }
         while (remainingBalance > 0) {
-            for (let i = 0; i < this.coinReverseLookupArray.length; i++) {
-                const currentCoin = this.coinReverseLookupArray[i];
-                if (currentCoin.coinValue <= remainingBalance) {
-                    this.rejectedCoins.push(currentCoin.coinName);
-                    //for EXACT CHANGE ONLY scenario - Last TestCase
-                    if (currentCoin.coin.count - 1 < 1) {
-                        this.resetState(initialRejectedCoins);
-                        return false;
-                    }
-                    currentCoin.coin.count -= 1;
-                    remainingBalance -= currentCoin.coinValue;
-                    break;
-                }
-            }
+            this.processCoinRejection(remainingBalance, initialRejectedCoins)
         }
         return true;
     }
-
     resetState = (initialRejectedCoins) => {
         this.rejectedCoins = initialRejectedCoins;
     }
-
     selectProduct = (productNumber) => {
         let selectedProduct = this.productLookUp[parseInt(productNumber)];
         if (this.balance < selectedProduct.price) {
